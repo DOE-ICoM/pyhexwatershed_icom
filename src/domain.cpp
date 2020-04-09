@@ -814,9 +814,15 @@ namespace hexwatershed
                       && dLongitude_left <= dLongitude_right )
                   {
                     hexagon cCell;
+
+
                     cCell.lGlobalID = lIndex;
                     cCell.dLatitude = dLatitude;
                     cCell.dLongitude = dLongitude;
+
+                    //now read the vertex using global id and index
+
+
                     vCell.push_back(cCell);
                   }
                 else
