@@ -28,6 +28,8 @@ namespace hexwatershed
 
           long lGlobalID;
           long lID;
+          
+      
           int iFlag_active;
           int iFlag_watershed;
           int iFlag_stream;
@@ -43,14 +45,16 @@ namespace hexwatershed
           int nNeighbor;
           int nUpslope;
           int iSegment_downstream;
-
+          int nEdge;
           int nVertex; //the vertex number from polygon
           //std::string sMeta;
           long lIndex_downslope;
           long lAccumulation;
             
           double dSlope;
-          double dLength_edge;
+          double dLength_edge_average;
+          std::vector<double> vLength_edge;
+
           double dX; //map projection
           double dY; //map projection
           double dZ; 

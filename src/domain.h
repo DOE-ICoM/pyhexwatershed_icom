@@ -18,8 +18,10 @@
 #include <queue>
 #include <numeric>
 #include <utility>
-#include <netcdf>
+//netcdf library
+#include <netcdf> //C++
 
+//gdal library
 #include "ogrsf_frmts.h"
 #include "system.h"
 #include "hexagon.h"
@@ -96,16 +98,21 @@ public:
   
   double missing_value;
 
+  double dLatitude_top;
+  double dLatitude_bottom;
+  double dLongitude_left;
+  double dLongitude_right;
+
   std::string sWorkspace_data;
   std::string sWorkspace_output;
   std::string sFilename_configuration;
   std::string sFilename_log;
   std::string sLog;
 
-std::string sFilename_hexagon_netcdf;
+  std::string sFilename_hexagon_netcdf;
 
-  std::string sFilename_hexagon_point_shapefile;
-  std::string sFilename_hexagon_polygon_shapefile;
+  //std::string sFilename_hexagon_point_shapefile;
+  //std::string sFilename_hexagon_polygon_shapefile;
 
   std::string sFilename_elevation_raster;
 
@@ -193,6 +200,8 @@ std::string sFilename_hexagon_netcdf;
 int domain_read_cell_information_by_netcdf(std::string sFilename_hexagon_netcdf_in,   std::string sFilename_elevation_in);
   int read_digital_elevation_model(std::string sFilename_elevation_in);
 
+  int read_hexagon_polygon_netcdf( std::string sFilename_hexagon_netcdf_in  );
+
   int read_hexagon_point_shapefile(std::string sFilename_hexagon_point_shapefile_in);
 
   int read_hexagon_polygon_shapefile(std::string sFilename_hexagon_polygon_shapefile_in);
@@ -256,14 +265,12 @@ int domain_read_cell_information_by_netcdf(std::string sFilename_hexagon_netcdf_
                                   std::string sFilename_in,
                                   std::string sLayername_in);
  
-
-
   int domain_save_polygon_vector(eVariable eV_in,
                                  std::string sFieldname_in,
                                  std::string sFilename_in,
                                  std::string sLayer_name_in);
 
- int domain_save_vtk(    std::string sFilename_in);
+ int domain_save_vtk( std::string sFilename_in);
 
   int domain_cleanup();
 
