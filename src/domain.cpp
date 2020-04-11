@@ -506,7 +506,7 @@ namespace hexwatershed
     error_code = read_hexagon_polygon_netcdf(sFilename_hexagon_netcdf_in);
     if (error_code != 0)
       {
-        //each polygon should have 5/6 vextex
+        //each polygon should have 5/6/7 vextex
         //now we will calculate point location based on polygon location
         domain_assign_elevation_to_hexagon();
       }
@@ -697,9 +697,14 @@ namespace hexwatershed
         printf("Size is %dx%dx%d\n",
                poDS_elevation->GetRasterXSize(), poDS_elevation->GetRasterYSize(),
                poDS_elevation->GetRasterCount());
-        if (poDS_elevation->GetProjectionRef() != NULL)
+        auto pProjection = poDS_elevation->GetProjectionRef() ;
+        std::string sP = pProjection;
+        sProjection = sP;
+        OGRSpatialReference pOGR(pProjection);
+        pOSR_dem = pOGR;
+        if (pProjection != NULL)
           {
-            printf("Projection is `%s'\n", poDS_elevation->GetProjectionRef());
+            printf("Projection is `%s'\n", sProjection);
           }
         if (poDS_elevation->GetGeoTransform(adfGeoTransform) == CE_None)
           {
@@ -783,6 +788,13 @@ namespace hexwatershed
     int * aVertexOnCell;
     int * aIndexToCellID;
     int * aIndexToVertexID;
+
+    GDALAllRegister();
+    OGRSpatialReference pOSR_from;
+pOSR_from.SetWellKnownGeogCS("WGS84");
+OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOSR_from, &pOSR_dem);
+
+
     try
       {
         // Open the file for read access
@@ -810,12 +822,10 @@ namespace hexwatershed
         else
           {
             auto pDimension = pLatCell.getDim(0);
-
             auto pDimension1 = pVertexOnCell.getDim(0);
             auto pDimension2 = pVertexOnCell.getDim(1);
             auto pDimension3 = pIndexToCellID.getDim(0);
             auto pDimension4 = pIndexToVertexID.getDim(0);
-
             auto pDimension5 = pLatVertex.getDim(0);
             auto pDimension6 = pLonVertex.getDim(0);
             lDimension = pDimension.getSize();
@@ -828,13 +838,10 @@ namespace hexwatershed
             aLatitude = new double [lDimension];
             aLongitude = new double [lDimension];
             //the other data
-            //aVertexOnCell = create2DArray<int>(lDimension1,lDimension2);
-
-            //int aVertexOnCell[105233][7];
+  //some other variables are needed for index and vertex
             aVertexOnCell = new int [lDimension1 * lDimension2];
             aIndexToCellID = new int [lDimension3];
             aIndexToVertexID = new int [lDimension4];
-
             aLatitude_vertex = new double [lDimension5];
             aLongitude_vertex = new double [lDimension6];
 
@@ -843,12 +850,9 @@ namespace hexwatershed
             pVertexOnCell.getVar( aVertexOnCell);
             pIndexToCellID.getVar( aIndexToCellID);
             pIndexToVertexID.getVar( aIndexToVertexID);
-
             pLatVertex.getVar( aLatitude_vertex);
             pLonVertex.getVar( aLongitude_vertex);
-            //some other variables are needed for index and vertex
-
-
+            
 
             for (lIndex  = 0 ; lIndex < lDimension; lIndex++ )
               {
@@ -865,7 +869,7 @@ namespace hexwatershed
                     cCell.lGlobalID = lIndex;
                     cCell.dLatitude = dLatitude;
                     cCell.dLongitude = dLongitude;
-
+int reprojected = coordTrans->Transform(1, &dLongitude, &dLatitude);
                     //now read the vertex using global id and index
 
                     lCellID = aIndexToCellID[lIndex];  //lCellID should be lIndex+1
@@ -899,9 +903,6 @@ namespace hexwatershed
                           }
                       }
                     cCell.nVertex = nVertex;
-
-
-
                     vCell.push_back(cCell);
                   }
                 else
@@ -910,9 +911,6 @@ namespace hexwatershed
                   }
 
               }
-
-
-
           }
         //delete the memory
         delete[] aLatitude;
@@ -920,19 +918,13 @@ namespace hexwatershed
         delete[] aLatitude_vertex;
         delete[] aLongitude_vertex;
         delete[] aVertexOnCell;
-        //delete2DArray(aVertexOnCell);
         delete[] aIndexToCellID;
         delete[] aIndexToVertexID;
-
-        
       }
     catch(const std::exception& e)
       {
         std::cerr << e.what() << '\n';
       }
-
-
-
     return error_code;
   }
 

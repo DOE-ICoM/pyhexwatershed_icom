@@ -60,6 +60,8 @@ public:
   domain(std::string sFilename_configuration);
   ~domain();
 
+std::string sProjection;
+OGRSpatialReference pOSR_dem;
  int iFile_type_io; //used for file io
  eFileTypeIO eFile_type_io; //used for file io
 
