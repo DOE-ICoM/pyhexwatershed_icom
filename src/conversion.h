@@ -19,7 +19,7 @@
 #include <iterator>
 #include <sstream>
 #include <vector>
-
+#include <regex>
 
 //50==================================================
 //local header
@@ -50,3 +50,6 @@ std::string convert_double_to_string(int iPrecision_in,
 
 std::vector<std::string> split_string_by_space(std::string sString_in);
 std::vector<std::string> split_string_by_delimiter(std::string sString_in, char cDelimiter_in);
+std::string ltrim(const std::string& s);
+std::string rtrim(const std::string& s);
+std::string trim(const std::string& s);

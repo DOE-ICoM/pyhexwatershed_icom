@@ -19,18 +19,16 @@
 #include <numeric>
 #include <utility>
 //netcdf library
-#include <netcdf> //C++
-
+#include <netcdf>
 //gdal library
 #include "ogrsf_frmts.h"
 #include "system.h"
 #include "hexagon.h"
 #include "segment.h"
 #include "conversion.h"
-
+#include "data.h"
 using namespace std;
 using namespace netCDF;
-using namespace netCDF::exceptions;
 
 enum eVariable
 {
@@ -111,8 +109,8 @@ public:
 
   std::string sFilename_hexagon_netcdf;
 
-  //std::string sFilename_hexagon_point_shapefile;
-  //std::string sFilename_hexagon_polygon_shapefile;
+  std::string sFilename_hexagon_point_shapefile;
+  std::string sFilename_hexagon_polygon_shapefile;
 
   std::string sFilename_elevation_raster;
 

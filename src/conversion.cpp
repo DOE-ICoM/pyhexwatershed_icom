@@ -139,7 +139,20 @@ double convert_from_calorie_per_centimeter_to_joule_per_meter(double dCalorie_pe
 }
 
 
+std::string ltrim(const std::string& s)
+ {
+	return std::regex_replace(s, std::regex("^\\s+"), std::string(""));
+}
 
+std::string rtrim(const std::string& s)
+ {
+	return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
+}
+
+std::string trim(const std::string& s) 
+{
+	return ltrim(rtrim(s));
+}
 /**
  * @brief split a string using space
  * 
@@ -184,7 +197,7 @@ std::vector<std::string> split_string_by_delimiter(std::string sString_in,
 		std::string dummy;
 		while (std::getline(ss, dummy, cDelimiter))
 		{
-			vTokens_out.push_back(dummy);
+			vTokens_out.push_back(trim(dummy));
 		}
 	}
 	else

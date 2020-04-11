@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iostream>
 
+#include <exception>
 #include <string>
 //50==================================================
 //cros-platform header

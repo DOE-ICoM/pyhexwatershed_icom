@@ -73,23 +73,22 @@ namespace hexwatershed
                                                           convert_integer_to_string(iFile_type_io, 1)));
     mParameter.insert(
                       std::pair<std::string, std::string>("sFilename_hexagon_netcdf",
-                                                          sFilename_hexagon_netcdf))
-      /**
-       * mParameter.insert(
-       std::pair<std::string, std::string>("sFilename_hexagon_point_shapefile",
-       sFilename_hexagon_point_shapefile));
+                                                          sFilename_hexagon_netcdf));
+    /**
+     * mParameter.insert(
+     std::pair<std::string, std::string>("sFilename_hexagon_point_shapefile",
+     sFilename_hexagon_point_shapefile));
 
-       mParameter.insert(
-       std::pair<std::string, std::string>("sFilename_hexagon_polygon_shapefile",
-       sFilename_hexagon_polygon_shapefile));
-      **/
-      mParameter.insert(std::pair<std::string, std::string>(
-                                                            "case",
-                                                            convert_integer_to_string(iCase, 1)));
-
+     mParameter.insert(
+     std::pair<std::string, std::string>("sFilename_hexagon_polygon_shapefile",
+     sFilename_hexagon_polygon_shapefile));
+    **/
     mParameter.insert(std::pair<std::string, std::string>(
-                                                          "accumulation_threshold",
-                                                          convert_double_to_string(dThreshold)));
+                                                          "case",
+                                                          convert_integer_to_string(iCase, 1)));
+
+    mParameter.insert(std::pair<std::string, std::string>( "accumulation_threshold",
+                                                           convert_double_to_string(dThreshold)));
 
     mParameter.insert(std::pair<std::string, std::string>(
                                                           "dLatitude_top",
@@ -233,7 +232,7 @@ namespace hexwatershed
                 continue;
               }
             //split the sLine
-            vTokens = split_string_by_space(sLine);
+            vTokens = split_string_by_delimiter(sLine, ',');
             //test the size of the vector
             iVector_size = vTokens.size();
             if (iVector_size == 2)
@@ -318,7 +317,7 @@ namespace hexwatershed
     search = mParameter.find(sKey);
     if (search != mParameter.end())
       {
-        this->sFilename_hexagon_netcdf = sWorkspace_data + slash + "vector" + slash + search->second;
+        this->sFilename_hexagon_netcdf = sWorkspace_data + slash + "vector" + slash + "mesh" + slash + search->second;
       }
 
     sKey = "sFilename_hexagon_point_shapefile";
@@ -629,8 +628,7 @@ namespace hexwatershed
                             (*pIterator).dZ = (*iIterator).dElevation;
                           }
 
-                        std::vector<vertex>::iterator it = std::find(vVertex_active.begin(),
-                                                                     vVertex_active.end(), *pIterator);
+                        std::vector<vertex>::iterator it = std::find(vVertex_active.begin(), vVertex_active.end(), *pIterator);
 
                         if (it != vVertex_active.end())
                           {
@@ -763,64 +761,145 @@ namespace hexwatershed
   {
     int error_code = 1 ;
     int iDimension;
-    size_t lDimension ;
+    size_t lDimension, lDimension1,lDimension2, lDimension3 ,lDimension4,lDimension5, lDimension6;
     long lIndex;
-    NcDim pDimension;
-    NcVar pLatCell;
-    NcVar pLonCell;
+    long lCellID;
+    long lIndexVertex;
+    long lIndex_vertex;
+
 
     std::vector<vertex> vVertex;
 
-    double dLatitude, dLongitude;
+    double dLatitude;
+    double dLongitude;
+    double dLatitude_vertex;
+    double dLongitude_vertex;
+
     double * aLatitude;
     double * aLongitude;
-
+    double * aLatitude_vertex;
+    double * aLongitude_vertex;
+    //aux
+    int * aVertexOnCell;
+    int * aIndexToCellID;
+    int * aIndexToVertexID;
     try
       {
         // Open the file for read access
         NcFile pFile(sFilename_hexagon_netcdf_in.c_str(), NcFile::read);
         //retrieve the dimension information
-
         //iDimension = pFile.getDimCount();
         //std::cout<< "The number of dimension in the mesh file is: " <<iDimension<<std::endl;
-
         //we will only use the total count of grid here
         //NcDim pDimension = pFile.getDim("nCells");
 
         // Retrieve the variable named "data"
-        pLatCell=pFile.getVar("latCell");
-        pLonCell=pFile.getVar("lonCell");
-        if(pLatCell.isNull() ||  pLonCell.isNull() )
+        auto pLatCell=pFile.getVar("latCell");
+        auto pLonCell=pFile.getVar("lonCell");
+
+        //the other information needed
+        auto pVertexOnCell=pFile.getVar("verticesOnCell");
+        auto pIndexToCellID=pFile.getVar("indexToCellID");
+        auto pIndexToVertexID=pFile.getVar("indexToVertexID");
+        auto pLatVertex=pFile.getVar("latVertex");
+        auto pLonVertex=pFile.getVar("lonVertex");
+        if(pLatCell.isNull() ||  pLonCell.isNull() || pVertexOnCell.isNull() || pIndexToCellID.isNull() || pIndexToVertexID.isNull() ||  pLatVertex.isNull() || pLonVertex.isNull())
           {
-            return NC_ERR;
+            return 0;
           }
         else
           {
-            pDimension = pLatCell.getDim(0);
-            lDimension = pDimension.getSize();
+            auto pDimension = pLatCell.getDim(0);
 
+            auto pDimension1 = pVertexOnCell.getDim(0);
+            auto pDimension2 = pVertexOnCell.getDim(1);
+            auto pDimension3 = pIndexToCellID.getDim(0);
+            auto pDimension4 = pIndexToVertexID.getDim(0);
+
+            auto pDimension5 = pLatVertex.getDim(0);
+            auto pDimension6 = pLonVertex.getDim(0);
+            lDimension = pDimension.getSize();
+            lDimension1 = pDimension1.getSize();
+            lDimension2 = pDimension2.getSize();
+            lDimension3 = pDimension3.getSize();
+            lDimension4 = pDimension4.getSize();
+            lDimension5 = pDimension5.getSize();
+            lDimension6 = pDimension6.getSize();
             aLatitude = new double [lDimension];
             aLongitude = new double [lDimension];
+            //the other data
+            //aVertexOnCell = create2DArray<int>(lDimension1,lDimension2);
+
+            //int aVertexOnCell[105233][7];
+            aVertexOnCell = new int [lDimension1 * lDimension2];
+            aIndexToCellID = new int [lDimension3];
+            aIndexToVertexID = new int [lDimension4];
+
+            aLatitude_vertex = new double [lDimension5];
+            aLongitude_vertex = new double [lDimension6];
+
             pLatCell.getVar( aLatitude);
             pLonCell.getVar( aLongitude);
-            for (lIndex  = 0 ; lIndex < lDimension; iIndex++ )
+            pVertexOnCell.getVar( aVertexOnCell);
+            pIndexToCellID.getVar( aIndexToCellID);
+            pIndexToVertexID.getVar( aIndexToVertexID);
+
+            pLatVertex.getVar( aLatitude_vertex);
+            pLonVertex.getVar( aLongitude_vertex);
+            //some other variables are needed for index and vertex
+
+
+
+            for (lIndex  = 0 ; lIndex < lDimension; lIndex++ )
               {
                 //add it only if it is within boundary, will also save the index
-                dLatitude = aLatitude[lIndex];
-                dLongitude = aLongitude[lIndex];
-                if(  dLatitude >= dLatitude_bottom 
-                && dLatitude <= dLatitude_top
+                //at the same time convert it to degree
+                dLatitude = aLatitude[lIndex] / pi * 180.0;
+                dLongitude = aLongitude[lIndex]  / pi * 180.0;
+                if(  dLatitude >= dLatitude_bottom
+                     && dLatitude <= dLatitude_top
                      && dLongitude >= dLongitude_left
-                      && dLongitude_left <= dLongitude_right )
+                     && dLongitude_left <= dLongitude_right )
                   {
                     hexagon cCell;
-
-
                     cCell.lGlobalID = lIndex;
                     cCell.dLatitude = dLatitude;
                     cCell.dLongitude = dLongitude;
 
                     //now read the vertex using global id and index
+
+                    lCellID = aIndexToCellID[lIndex];  //lCellID should be lIndex+1
+
+                    //find the vertex indices
+                    int nVertex = 0;
+
+                    for (int i = 0 ; i < 7; i++) //the max number of vertext count is 7
+                      {
+                        long dummy_index  = (lCellID-1) * 7 + i;
+                        lIndexVertex = aVertexOnCell[dummy_index];
+                        if(lIndexVertex !=0)
+                          {
+                            nVertex = nVertex + 1 ;
+
+                            //use this index to find its location
+                            lIndex_vertex = aIndexToVertexID[lIndexVertex];
+                            dLatitude_vertex = aLatitude_vertex[lIndex_vertex-1]/ pi * 180.0;
+                            dLongitude_vertex = aLongitude_vertex[lIndex_vertex-1]/ pi * 180.0;
+                            vertex pVertex;
+                            pVertex.dLatitude = dLatitude_vertex;
+                            pVertex.dLongitude = dLongitude_vertex;
+                            pVertex.lIndex = lIndex_vertex;
+
+                            cCell.vVertex.push_back(pVertex);
+
+                          }
+                        else
+                          {
+                            //this is hexagon, so there is no more vertex
+                          }
+                      }
+                    cCell.nVertex = nVertex;
+
 
 
                     vCell.push_back(cCell);
@@ -832,7 +911,20 @@ namespace hexwatershed
 
               }
 
+
+
           }
+        //delete the memory
+        delete[] aLatitude;
+        delete[] aLongitude;
+        delete[] aLatitude_vertex;
+        delete[] aLongitude_vertex;
+        delete[] aVertexOnCell;
+        //delete2DArray(aVertexOnCell);
+        delete[] aIndexToCellID;
+        delete[] aIndexToVertexID;
+
+        
       }
     catch(const std::exception& e)
       {
@@ -1272,7 +1364,7 @@ namespace hexwatershed
               {
                 std::cout << "Slope should be positive!" << std::endl;
               }
-            (vCell_active.at(lIndex_self)).dSlope = -dDifference / ((vCell_active.at(lIndex_self)).dLength_edge * sqrt(3.0));
+            (vCell_active.at(lIndex_self)).dSlope = -dDifference / ((vCell_active.at(lIndex_self)).dLength_edge_average * sqrt(3.0));
           }
       }
     return error_code;
@@ -1908,7 +2000,7 @@ namespace hexwatershed
     long lCount = 0;
 
     double dArea_hexagon;
-    double dLength_hexagon = (vCell_active[0]).dLength_edge;
+    double dLength_hexagon = (vCell_active[0]).dLength_edge_average;
 
     std::vector<hexagon>::iterator iIterator;
 
@@ -1936,7 +2028,9 @@ namespace hexwatershed
 
     long lSegment = 0;
 
-    double dLength_hexagon = (vCell_active[0]).dLength_edge;
+    //the hexagon changed from traditional hexagon to adapative hexagon
+    //double dLength_hexagon = (vCell_active[0]).dLength_edge;
+    double dLength_hexagon = (vCell_active[0]).dLength_edge_average;
 
     std::vector<hexagon>::iterator iIterator;
 
@@ -1964,7 +2058,7 @@ namespace hexwatershed
     long lIndex_current;
     long lIndex_ownstream;
 
-    double dLength_hexagon = (vCell_active[0]).dLength_edge;
+    double dLength_hexagon = (vCell_active[0]).dLength_edge_average;
     //loop through head water
     std::vector<segment>::iterator iIterator;
 
@@ -2067,7 +2161,7 @@ namespace hexwatershed
     double b;
     double c;
     double d;
-    double dLength_hexagon = (vCell_active[0]).dLength_edge;
+    double dLength_hexagon = (vCell_active[0]).dLength_edge_average;
     double dArea_hexagon;
     double dTwi;
     dArea_hexagon = 1.5 * sqrt(3.0) * dLength_hexagon * dLength_hexagon;
@@ -3343,7 +3437,7 @@ namespace hexwatershed
             //center location
             dX_self = (vCell_active.at(lIndex_self)).dX;
             dY_self = (vCell_active.at(lIndex_self)).dY;
-            dDistance_min = (vCell_active.at(lIndex_self)).dLength_edge * sqrt(3);
+            dDistance_min = (vCell_active.at(lIndex_self)).dLength_edge_average * sqrt(3.0);
             for (lIndex_search = 0; lIndex_search < vCell_active.size(); lIndex_search++)
               {
                 if (lIndex_self == lIndex_search)
