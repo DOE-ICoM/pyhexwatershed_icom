@@ -706,6 +706,8 @@ namespace hexwatershed
         sProjection = sP;
         OGRSpatialReference pOGR(pProjection);
         pOSR_dem = pOGR;
+        oSRS = &pOSR_dem;
+
         if (pProjection != NULL)
           {
             printf("Projection is `%s'\n", sProjection);
