@@ -42,7 +42,7 @@ namespace hexwatershed
           int iSegment_order;
           int iSubbasin;
           int iFlag_confluence;
-          int nNeighbor;
+          int nNeighbor;//actual neighbor
           int nUpslope;
           int iSegment_downstream;
           int nEdge;

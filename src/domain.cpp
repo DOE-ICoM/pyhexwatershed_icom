@@ -532,7 +532,7 @@ namespace hexwatershed
     double dX_dummy, dY_dummy;
     long lColumn_index, lRow_index, lIndex;
     long lLocal_index; //local index
-    long iVextex_index = 0;
+    long iVertex_index = 0;
     std::vector<double> vX;
     std::vector<double> vY;
     std::vector<hexagon>::iterator iIterator;
@@ -588,10 +588,14 @@ namespace hexwatershed
           {
             //at least one is valid
             //calculate center location
-            dX_dummy = (std::accumulate(vX.begin(), vX.end(), 0.0)) / nPt;
-            dY_dummy = (std::accumulate(vY.begin(), vY.end(), 0.0)) / nPt;
-            (*iIterator).dX = dX_dummy;
-            (*iIterator).dY = dY_dummy;
+            //dX_dummy = (std::accumulate(vX.begin(), vX.end(), 0.0)) / nPt;
+            //dY_dummy = (std::accumulate(vY.begin(), vY.end(), 0.0)) / nPt;
+            //(*iIterator).dX = dX_dummy;
+            //(*iIterator).dY = dY_dummy;
+            dX_dummy = (*iIterator).dX;
+            dY_dummy = (*iIterator).dY;
+
+
             dDummy1 = (dX_dummy - dX_origin) / dResolution_elevation;
             lColumn_index = long(round(dDummy1));
             dDummy2 = (dY_origin - dY_dummy) / dResolution_elevation;
@@ -637,9 +641,9 @@ namespace hexwatershed
                           }
                         else
                           {
-                            (*pIterator).lIndex = iVextex_index;
+                            (*pIterator).lIndex = iVertex_index;
 
-                            iVextex_index = iVextex_index + 1;
+                            iVertex_index = iVertex_index + 1;
                             vVertex_active.push_back(*pIterator);
                           }
                       }
@@ -771,7 +775,7 @@ namespace hexwatershed
     long lCellID;
     long lIndexVertex;
     long lIndex_vertex;
-
+int reprojected1, reprojected2;
 
     std::vector<vertex> vVertex;
 
@@ -791,8 +795,8 @@ namespace hexwatershed
 
     GDALAllRegister();
     OGRSpatialReference pOSR_from;
-pOSR_from.SetWellKnownGeogCS("WGS84");
-OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOSR_from, &pOSR_dem);
+    pOSR_from.SetWellKnownGeogCS("WGS84");
+    OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOSR_from, &pOSR_dem);
 
 
     try
@@ -838,7 +842,7 @@ OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOS
             aLatitude = new double [lDimension];
             aLongitude = new double [lDimension];
             //the other data
-  //some other variables are needed for index and vertex
+            //some other variables are needed for index and vertex
             aVertexOnCell = new int [lDimension1 * lDimension2];
             aIndexToCellID = new int [lDimension3];
             aIndexToVertexID = new int [lDimension4];
@@ -852,7 +856,7 @@ OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOS
             pIndexToVertexID.getVar( aIndexToVertexID);
             pLatVertex.getVar( aLatitude_vertex);
             pLonVertex.getVar( aLongitude_vertex);
-            
+
 
             for (lIndex  = 0 ; lIndex < lDimension; lIndex++ )
               {
@@ -860,16 +864,27 @@ OGRCoordinateTransformation* coordTrans = OGRCreateCoordinateTransformation(&pOS
                 //at the same time convert it to degree
                 dLatitude = aLatitude[lIndex] / pi * 180.0;
                 dLongitude = aLongitude[lIndex]  / pi * 180.0;
+                if(dLongitude > 180.0 )
+                  {
+                    dLongitude = dLongitude -360.0;
+                  }
                 if(  dLatitude >= dLatitude_bottom
                      && dLatitude <= dLatitude_top
                      && dLongitude >= dLongitude_left
-                     && dLongitude_left <= dLongitude_right )
+                     && dLongitude <= dLongitude_right )
                   {
                     hexagon cCell;
                     cCell.lGlobalID = lIndex;
                     cCell.dLatitude = dLatitude;
                     cCell.dLongitude = dLongitude;
-int reprojected = coordTrans->Transform(1, &dLongitude, &dLatitude);
+                     reprojected1 = coordTrans->Transform(1, &dLongitude, &dLatitude);
+                    if(reprojected1 == 1 )
+                      {
+                        cCell.dX = dLongitude;
+                        cCell.dY = dLatitude;
+                      }
+                    else
+                      {}
                     //now read the vertex using global id and index
 
                     lCellID = aIndexToCellID[lIndex];  //lCellID should be lIndex+1
@@ -889,11 +904,24 @@ int reprojected = coordTrans->Transform(1, &dLongitude, &dLatitude);
                             lIndex_vertex = aIndexToVertexID[lIndexVertex];
                             dLatitude_vertex = aLatitude_vertex[lIndex_vertex-1]/ pi * 180.0;
                             dLongitude_vertex = aLongitude_vertex[lIndex_vertex-1]/ pi * 180.0;
+                            if(dLongitude_vertex > 180.0 )
+                              {
+                                dLongitude_vertex = dLongitude_vertex -360.0;
+                              }
                             vertex pVertex;
                             pVertex.dLatitude = dLatitude_vertex;
                             pVertex.dLongitude = dLongitude_vertex;
                             pVertex.lIndex = lIndex_vertex;
+                             reprojected2 = coordTrans->Transform(1, &dLongitude_vertex, &dLatitude_vertex);
+                            if(reprojected2 == 1 )
+                              {
+                                pVertex.dX = dLongitude_vertex;
+                                pVertex.dY = dLatitude_vertex;
+                              }
+                            else
+                              {
 
+                              }
                             cCell.vVertex.push_back(pVertex);
 
                           }
@@ -3348,7 +3376,7 @@ int reprojected = coordTrans->Transform(1, &dLongitude, &dLatitude);
 
     for (iIterator1 = vCell_in.begin(); iIterator1 != vCell_in.end(); iIterator1++)
       {
-        if ((*iIterator1).nNeighbor < 6)
+        if ((*iIterator1).nNeighbor < (*iIterator1).nVertex)
           {
             vCell_out.push_back(*iIterator1);
           }
@@ -3537,7 +3565,7 @@ int reprojected = coordTrans->Transform(1, &dLongitude, &dLatitude);
                   }
               }
             //double check
-            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > 6)
+            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > 7)
               {
                 std::cout << "Too many neighbors" << std::endl;
               }
