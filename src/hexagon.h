@@ -36,13 +36,13 @@ namespace hexwatershed
           int iFlag_first_reach;
           int iFlag_last_reach;
           int iFlag_headwater;
-          int iFlag_neighbor;
+          int iFlag_neighbor; //
 
           int iSegment;
           int iSegment_order;
           int iSubbasin;
           int iFlag_confluence;
-          int nNeighbor;//actual neighbor
+          int nNeighbor;//actual neighbor, should be less or equal to nVertex/nedge
           int nUpslope;
           int iSegment_downstream;
           int nEdge;

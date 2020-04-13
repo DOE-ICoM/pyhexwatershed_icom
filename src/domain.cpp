@@ -477,7 +477,7 @@ namespace hexwatershed
           }
         else
           {
-            //each polygon should have 5/6 vextex
+            //each polygon should have 5/6/7 vextex
             //now we will calculate point location based on polygon location
             domain_assign_elevation_to_hexagon();
           }
@@ -518,7 +518,7 @@ namespace hexwatershed
     return error_code;
   }
   /**
-   * calculate the center location of a hexagon using 6 vertex
+   * calculate the center location of a hexagon using 6/7 vertex
    * @return
    */
   int domain::domain_assign_elevation_to_hexagon()
@@ -2693,7 +2693,7 @@ int reprojected1, reprojected2;
               for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
                 {
 
-                  if ((*iIterator).nNeighbor == 6)
+                  if ((*iIterator).nNeighbor == (*iIterator).nVertex)
                     {
                       poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
@@ -2744,7 +2744,7 @@ int reprojected1, reprojected2;
               for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
                 {
 
-                  if ((*iIterator).nNeighbor == 6 && (*iIterator).iFlag_watershed == 1)
+                  if ((*iIterator).nNeighbor == (*iIterator).nVertex && (*iIterator).iFlag_watershed == 1)
                     {
                       poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
@@ -2824,7 +2824,7 @@ int reprojected1, reprojected2;
                   for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
                     {
 
-                      if ((*iIterator).iFlag_stream == 1 && (*iIterator).nNeighbor == 6 && (*iIterator).iFlag_watershed == 1)
+                      if ((*iIterator).iFlag_stream == 1 && (*iIterator).nNeighbor == (*iIterator).nVertex && (*iIterator).iFlag_watershed == 1)
                         {
                           poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
@@ -3015,7 +3015,7 @@ int reprojected1, reprojected2;
         for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
           {
 
-            if ((*iIterator).nNeighbor == 6)
+            if ((*iIterator).nNeighbor == (*iIterator).nVertex)
               {
                 poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
@@ -3074,7 +3074,7 @@ int reprojected1, reprojected2;
         for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
           {
 
-            if ((*iIterator).nNeighbor == 6 && (*iIterator).iFlag_watershed == 1)
+            if ((*iIterator).nNeighbor == (*iIterator).nVertex && (*iIterator).iFlag_watershed == 1)
               {
                 poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
@@ -3231,7 +3231,8 @@ int reprojected1, reprojected2;
         //hexagon polygon
         for (iIterator = vCell_active.begin(); iIterator != vCell_active.end(); iIterator++)
           {
-            sLine = "6 ";
+            //sLine = "6 ";
+            sLine = convert_integer_to_string ((*iIterator).nVertex) + " ";
             for (pIterator = (*iIterator).vVertex.begin(); pIterator != (*iIterator).vVertex.end(); pIterator++)
               {
                 sLine = sLine + convert_long_to_string((*pIterator).lIndex + nHexagon) + " ";
@@ -3304,7 +3305,7 @@ int reprojected1, reprojected2;
   int domain::check_digital_elevation_model_depression(std::vector<hexagon> vCell_in)
   {
     int error_code = 1;
-    int iNeighbor;
+    int iNeighbor, nVertex;
     long lID;
     long lIndex_self, lIndex_search;
     double dElevation_min;
@@ -3321,7 +3322,8 @@ int reprojected1, reprojected2;
         if (error_code == 1)
           {
             iNeighbor = vCell_in.at(lIndex_self).nNeighbor;
-            if (iNeighbor == 6)
+            nVertex = vCell_in.at(lIndex_self).nVertex;
+            if (iNeighbor == nVertex)
               {
                 vNeighbor = vCell_in.at(lIndex_self).vNeighbor;
                 dElevation_self = vCell_in.at(lIndex_self).dElevation;
@@ -3480,7 +3482,7 @@ int reprojected1, reprojected2;
                   }
               }
 
-            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > 6)
+            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > (vCell_active.at(lIndex_self)).nVertex  )
               {
                 std::cout << "Too many neighbors" << std::endl;
               }
@@ -3501,7 +3503,7 @@ int reprojected1, reprojected2;
               {
                 if (lIndex_self == lIndex_search)
                   {
-                    //itself
+                    //itself is always checked
                     (vCell_active.at(lIndex_search)).iFlag_neighbor = 1;
                   }
                 else
@@ -3543,7 +3545,7 @@ int reprojected1, reprojected2;
                                     if (std::find((vCell_active.at(lIndex_self)).vNeighbor.begin(),
                                                   (vCell_active.at(lIndex_self)).vNeighbor.end(), (vCell_active.at(lIndex_search)).lID) != (vCell_active.at(lIndex_self)).vNeighbor.end())
                                       {
-                                        /* v contains x */
+                                        /* v contains x already */
                                       }
                                     else
                                       {
@@ -3565,7 +3567,7 @@ int reprojected1, reprojected2;
                   }
               }
             //double check
-            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > 7)
+            if ((vCell_active.at(lIndex_self)).vNeighbor.size() > (vCell_active.at(lIndex_self)).nVertex )
               {
                 std::cout << "Too many neighbors" << std::endl;
               }
