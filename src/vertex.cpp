@@ -8,6 +8,7 @@ vertex::vertex()
     dX = -9999; //map projection
     dY = -9999; //map projection
     dZ = -9999; //elevation of VTK
+    dElevation = -9999.0;
 }
 vertex::~vertex()
 {

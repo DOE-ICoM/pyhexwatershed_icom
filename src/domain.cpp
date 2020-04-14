@@ -772,12 +772,12 @@ namespace hexwatershed
   {
     int error_code = 1 ;
     int iDimension;
-    size_t lDimension, lDimension1,lDimension2, lDimension3 ,lDimension4,lDimension5, lDimension6;
+    size_t lDimension, lDimension1,lDimension2, lDimension3 ,lDimension4,lDimension5, lDimension6, lDimension7;
     long lIndex;
     long lCellID;
     long lIndexVertex;
     long lIndex_vertex;
-int reprojected1, reprojected2;
+    int reprojected1, reprojected2;
 
     std::vector<vertex> vVertex;
 
@@ -790,6 +790,7 @@ int reprojected1, reprojected2;
     double * aLongitude;
     double * aLatitude_vertex;
     double * aLongitude_vertex;
+    double * aArea;
     //aux
     int * aVertexOnCell;
     int * aIndexToCellID;
@@ -819,8 +820,9 @@ int reprojected1, reprojected2;
         auto pVertexOnCell=pFile.getVar("verticesOnCell");
         auto pIndexToCellID=pFile.getVar("indexToCellID");
         auto pIndexToVertexID=pFile.getVar("indexToVertexID");
-        auto pLatVertex=pFile.getVar("latVertex");
         auto pLonVertex=pFile.getVar("lonVertex");
+        auto pLatVertex=pFile.getVar("areaCell");
+auto pArea=pFile.getVar("latVertex");
         if(pLatCell.isNull() ||  pLonCell.isNull() || pVertexOnCell.isNull() || pIndexToCellID.isNull() || pIndexToVertexID.isNull() ||  pLatVertex.isNull() || pLonVertex.isNull())
           {
             return 0;
@@ -832,8 +834,9 @@ int reprojected1, reprojected2;
             auto pDimension2 = pVertexOnCell.getDim(1);
             auto pDimension3 = pIndexToCellID.getDim(0);
             auto pDimension4 = pIndexToVertexID.getDim(0);
-            auto pDimension5 = pLatVertex.getDim(0);
-            auto pDimension6 = pLonVertex.getDim(0);
+            auto pDimension5 = pLonVertex.getDim(0);
+            auto pDimension6 = pLatVertex.getDim(0);
+auto pDimension7 = pArea.getDim(0);
             lDimension = pDimension.getSize();
             lDimension1 = pDimension1.getSize();
             lDimension2 = pDimension2.getSize();
@@ -841,6 +844,7 @@ int reprojected1, reprojected2;
             lDimension4 = pDimension4.getSize();
             lDimension5 = pDimension5.getSize();
             lDimension6 = pDimension6.getSize();
+             lDimension7 = pDimension7.getSize();
             aLatitude = new double [lDimension];
             aLongitude = new double [lDimension];
             //the other data
@@ -848,73 +852,88 @@ int reprojected1, reprojected2;
             aVertexOnCell = new int [lDimension1 * lDimension2];
             aIndexToCellID = new int [lDimension3];
             aIndexToVertexID = new int [lDimension4];
-            aLatitude_vertex = new double [lDimension5];
-            aLongitude_vertex = new double [lDimension6];
+            aLongitude_vertex = new double [lDimension5];
+            aLatitude_vertex = new double [lDimension6];
 
+aArea = new double [lDimension7];
             pLatCell.getVar( aLatitude);
             pLonCell.getVar( aLongitude);
             pVertexOnCell.getVar( aVertexOnCell);
             pIndexToCellID.getVar( aIndexToCellID);
             pIndexToVertexID.getVar( aIndexToVertexID);
-            pLatVertex.getVar( aLatitude_vertex);
             pLonVertex.getVar( aLongitude_vertex);
+            pLatVertex.getVar( aLatitude_vertex);
 
+ pArea.getVar( aArea);
 
-            for (lIndex  = 0 ; lIndex < lDimension; lIndex++ )
+            for (lIndex  = 1 ; lIndex <= lDimension; lIndex++ )
               {
                 //add it only if it is within boundary, will also save the index
                 //at the same time convert it to degree
-                dLatitude = aLatitude[lIndex] / pi * 180.0;
-                dLongitude = aLongitude[lIndex]  / pi * 180.0;
+
+                dLongitude = aLongitude[lIndex-1]  / pi * 180.0;
                 if(dLongitude > 180.0 )
                   {
                     dLongitude = dLongitude -360.0;
                   }
-                if(  dLatitude >= dLatitude_bottom
-                     && dLatitude <= dLatitude_top
-                     && dLongitude >= dLongitude_left
-                     && dLongitude <= dLongitude_right )
+                dLatitude = aLatitude[lIndex-1] / pi * 180.0;
+
+                if(  dLongitude >= dLongitude_left
+                     && dLongitude <= dLongitude_right
+                     && dLatitude >= dLatitude_bottom
+                     && dLatitude <= dLatitude_top)
                   {
                     hexagon cCell;
                     cCell.lGlobalID = lIndex;
-                    cCell.dLatitude = dLatitude;
                     cCell.dLongitude = dLongitude;
-                     reprojected1 = coordTrans->Transform(1, &dLongitude, &dLatitude);
+                    cCell.dLatitude = dLatitude;
+
+                    reprojected1 = coordTrans->Transform(1, &dLongitude, &dLatitude);
                     if(reprojected1 == 1 )
                       {
                         cCell.dX = dLongitude;
                         cCell.dY = dLatitude;
+                        cCell.dArea = aArea[lIndex-1];
                       }
                     else
-                      {}
+                      {
+
+                      }
                     //now read the vertex using global id and index
 
-                    lCellID = aIndexToCellID[lIndex];  //lCellID should be lIndex+1
+                    lCellID = aIndexToCellID[lIndex-1];  //lCellID should be lIndex+1
 
                     //find the vertex indices
                     int nVertex = 0;
+                    //int iFlag_finish = 0;
+                    //long start_index  = (lCellID-1) * 7 ;
+                    //long next_index = -1;
+                    //long current_index = start_index;
+                    long dummy_index;
+                    std::vector<vertex> vVertex;
 
-                    for (int i = 0 ; i < 7; i++) //the max number of vertext count is 7
+                    for (int i = 1 ; i <= 7; i++) //the max number of vertext count is 7
                       {
-                        long dummy_index  = (lCellID-1) * 7 + i;
+                        dummy_index = (lCellID-1) * 7 + i-1;
                         lIndexVertex = aVertexOnCell[dummy_index];
                         if(lIndexVertex !=0)
                           {
                             nVertex = nVertex + 1 ;
-
                             //use this index to find its location
-                            lIndex_vertex = aIndexToVertexID[lIndexVertex];
-                            dLatitude_vertex = aLatitude_vertex[lIndex_vertex-1]/ pi * 180.0;
+                            lIndex_vertex = aIndexToVertexID[lIndexVertex-1];
                             dLongitude_vertex = aLongitude_vertex[lIndex_vertex-1]/ pi * 180.0;
                             if(dLongitude_vertex > 180.0 )
                               {
                                 dLongitude_vertex = dLongitude_vertex -360.0;
                               }
+                            dLatitude_vertex = aLatitude_vertex[lIndex_vertex-1]/ pi * 180.0;
+
                             vertex pVertex;
-                            pVertex.dLatitude = dLatitude_vertex;
                             pVertex.dLongitude = dLongitude_vertex;
+                            pVertex.dLatitude = dLatitude_vertex;
+
                             pVertex.lIndex = lIndex_vertex;
-                             reprojected2 = coordTrans->Transform(1, &dLongitude_vertex, &dLatitude_vertex);
+                            reprojected2 = coordTrans->Transform(1, &dLongitude_vertex, &dLatitude_vertex);
                             if(reprojected2 == 1 )
                               {
                                 pVertex.dX = dLongitude_vertex;
@@ -924,7 +943,7 @@ int reprojected1, reprojected2;
                               {
 
                               }
-                            cCell.vVertex.push_back(pVertex);
+                            vVertex.push_back(pVertex);
 
                           }
                         else
@@ -932,6 +951,35 @@ int reprojected1, reprojected2;
                             //this is hexagon, so there is no more vertex
                           }
                       }
+                    //now re-order them
+                    //std::vector<vertex>::iterator pIterator;
+                    //vertex pvertex_start = vVertex.at(0);
+                    //std::vector<vertex> vVertex_order;
+                    //vVertex_order.push_back(pvertex_start);
+                    //for (pIterator = vVertex.begin(); pIterator!=vVertex.end(); //pIterator++)
+                    //{
+
+                    //}
+
+                    //finished re-order
+                    std::vector<double> vDistance;
+                    for(int i=0;i <nVertex;i++)
+                      {
+                        double a = (cCell.dX -vVertex.at(i).dX )*(cCell.dX -vVertex.at(i).dX) +(cCell.dY -vVertex.at(i).dY)*(cCell.dY -vVertex.at(i).dY);
+                        vDistance.push_back(a);
+                      }
+                    double dMin = *(std::min_element(vDistance.begin(), vDistance.end()));
+                    double dMax = *(std::max_element(vDistance.begin(), vDistance.end()));
+                    if(  dMax > dMin * 1.5     )
+                      {
+                        //this is an error in most cases
+                        std::cout<< dMin << dMax <<std::endl;
+                      }
+                    else
+                      {
+
+                      }
+                    cCell.vVertex = vVertex;
                     cCell.nVertex = nVertex;
                     vCell.push_back(cCell);
                   }
@@ -1477,8 +1525,13 @@ int reprojected1, reprojected2;
                                 //std::cout << "===" << lIndex_neighbor << std::endl;
                                 //std::cout << "====" << lIndex_downslope_neighbor << std::endl;
                                 //this one accepts upslope and the upslope is done
-                                (*iIterator_self).lAccumulation =
-                                  (*iIterator_self).lAccumulation + vCell_active.at(lIndex_neighbor).lAccumulation + 1;
+                                //(*iIterator_self).lAccumulation =
+                                //  (*iIterator_self).lAccumulation + vCell_active.at(lIndex_neighbor).lAccumulation + 1;
+
+                                 //modify to accout for area difference
+                                 (*iIterator_self).lAccumulation =
+                                  (*iIterator_self).lAccumulation + vCell_active.at(lIndex_neighbor).lAccumulation + vCell_active.at(lIndex_neighbor).dArea/1000000.0;
+
                               }
                             else
                               {
@@ -3049,7 +3102,7 @@ int reprojected1, reprojected2;
                   {
                     dX = (*pIterator).dX;
                     dY = (*pIterator).dY;
-                    //pt.addPoint(dX, dY);
+
                     poExteriorRing.addPoint(dX, dY);
                   }
                 poExteriorRing.closeRings();
