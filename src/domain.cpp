@@ -812,17 +812,15 @@ namespace hexwatershed
         //we will only use the total count of grid here
         //NcDim pDimension = pFile.getDim("nCells");
 
-        // Retrieve the variable named "data"
-        auto pLatCell=pFile.getVar("latCell");
-        auto pLonCell=pFile.getVar("lonCell");
-
-        //the other information needed
-        auto pVertexOnCell=pFile.getVar("verticesOnCell");
-        auto pIndexToCellID=pFile.getVar("indexToCellID");
-        auto pIndexToVertexID=pFile.getVar("indexToVertexID");
-        auto pLonVertex=pFile.getVar("lonVertex");
-        auto pLatVertex=pFile.getVar("areaCell");
-auto pArea=pFile.getVar("latVertex");
+        // Retrieve the variable from MPAS mesh
+        auto pLonCell=pFile.getVar("lonCell"); //longitude of cell center
+        auto pLatCell=pFile.getVar("latCell"); //latitude of cell center
+        auto pVertexOnCell=pFile.getVar("verticesOnCell"); //vertics on each cell
+        auto pIndexToCellID=pFile.getVar("indexToCellID"); //cell index
+        auto pIndexToVertexID=pFile.getVar("indexToVertexID"); //vertex index
+        auto pLonVertex=pFile.getVar("lonVertex"); //longitude of vertex
+        auto pLatVertex=pFile.getVar("latVertex"); //latitude of vertex
+        auto pArea=pFile.getVar("areaCell"); //area of each cell
         if(pLatCell.isNull() ||  pLonCell.isNull() || pVertexOnCell.isNull() || pIndexToCellID.isNull() || pIndexToVertexID.isNull() ||  pLatVertex.isNull() || pLonVertex.isNull())
           {
             return 0;
@@ -836,7 +834,7 @@ auto pArea=pFile.getVar("latVertex");
             auto pDimension4 = pIndexToVertexID.getDim(0);
             auto pDimension5 = pLonVertex.getDim(0);
             auto pDimension6 = pLatVertex.getDim(0);
-auto pDimension7 = pArea.getDim(0);
+            auto pDimension7 = pArea.getDim(0);
             lDimension = pDimension.getSize();
             lDimension1 = pDimension1.getSize();
             lDimension2 = pDimension2.getSize();
@@ -844,7 +842,7 @@ auto pDimension7 = pArea.getDim(0);
             lDimension4 = pDimension4.getSize();
             lDimension5 = pDimension5.getSize();
             lDimension6 = pDimension6.getSize();
-             lDimension7 = pDimension7.getSize();
+            lDimension7 = pDimension7.getSize();
             aLatitude = new double [lDimension];
             aLongitude = new double [lDimension];
             //the other data
@@ -854,8 +852,8 @@ auto pDimension7 = pArea.getDim(0);
             aIndexToVertexID = new int [lDimension4];
             aLongitude_vertex = new double [lDimension5];
             aLatitude_vertex = new double [lDimension6];
+            aArea = new double [lDimension7];
 
-aArea = new double [lDimension7];
             pLatCell.getVar( aLatitude);
             pLonCell.getVar( aLongitude);
             pVertexOnCell.getVar( aVertexOnCell);
@@ -863,8 +861,7 @@ aArea = new double [lDimension7];
             pIndexToVertexID.getVar( aIndexToVertexID);
             pLonVertex.getVar( aLongitude_vertex);
             pLatVertex.getVar( aLatitude_vertex);
-
- pArea.getVar( aArea);
+            pArea.getVar( aArea);
 
             for (lIndex  = 1 ; lIndex <= lDimension; lIndex++ )
               {
@@ -1528,8 +1525,8 @@ aArea = new double [lDimension7];
                                 //(*iIterator_self).lAccumulation =
                                 //  (*iIterator_self).lAccumulation + vCell_active.at(lIndex_neighbor).lAccumulation + 1;
 
-                                 //modify to accout for area difference
-                                 (*iIterator_self).lAccumulation =
+                                //modify to accout for area difference
+                                (*iIterator_self).lAccumulation =
                                   (*iIterator_self).lAccumulation + vCell_active.at(lIndex_neighbor).lAccumulation + vCell_active.at(lIndex_neighbor).dArea/1000000.0;
 
                               }
@@ -2711,6 +2708,24 @@ aArea = new double [lDimension7];
       }
 
     GIntBig lValue;
+GIntBig lIndex_downslope2;
+
+    double dValue;
+    std::string sFieldname_elevation = "elev";
+    OGRFieldDefn oField_elevation(sFieldname_elevation.c_str(), OFTReal);
+    oField_elevation.SetWidth(64);
+    oField_elevation.SetPrecision(4);
+
+    std::string sFieldname_id = "id";
+    OGRFieldDefn oField_id(sFieldname_id.c_str(), OFTInteger64);
+    oField_id.SetWidth(64);
+
+
+    std::string sFieldname_downslope = "downslope";
+    OGRFieldDefn oField_downslope(sFieldname_downslope.c_str(), OFTInteger64);
+    oField_downslope.SetWidth(64);
+
+
     poDriver = GetGDALDriverManager()->GetDriverByName(pszDriverName);
     if (poDriver == NULL)
       {
@@ -2739,6 +2754,22 @@ aArea = new double [lDimension7];
         exit(1);
       }
 
+      if (poLayer->CreateField(&oField_elevation) != OGRERR_NONE)
+      {
+        printf("Creating Name field failed.\n");
+        exit(1);
+      }
+
+if (poLayer->CreateField(&oField_id) != OGRERR_NONE)
+      {
+        printf("Creating Name field failed.\n");
+        exit(1);
+      }
+      if (poLayer->CreateField(&oField_downslope) != OGRERR_NONE)
+      {
+        printf("Creating Name field failed.\n");
+        exit(1);
+      }
     if (iFlag_debug == 1)
       {
         switch (eV_in)
@@ -2753,14 +2784,18 @@ aArea = new double [lDimension7];
                       poFeature = OGRFeature::CreateFeature(poLayer->GetLayerDefn());
 
                       lValue = (*iIterator).lID;
-
-                      //iValue = (*iIterator).iSegment;
-                      poFeature->SetField(sFieldname_in.c_str(), lValue);
-
                       dX_start = (*iIterator).dX;
                       dY_start = (*iIterator).dY;
-
+                      dValue = (*iIterator).dElevation;
                       lIndex_downslope = (*iIterator).lIndex_downslope;
+                      lIndex_downslope2= lIndex_downslope;
+                      //iValue = (*iIterator).iSegment;
+                      poFeature->SetField(sFieldname_in.c_str(), lValue);                      
+                      poFeature->SetField(sFieldname_elevation.c_str(), dValue);
+                      poFeature->SetField(sFieldname_id.c_str(), lValue);
+                      poFeature->SetField(sFieldname_downslope.c_str(), lIndex_downslope2);
+
+                      
                       dX_end = vCell_active.at(lIndex_downslope).dX;
                       dY_end = vCell_active.at(lIndex_downslope).dY;
 
@@ -2775,6 +2810,7 @@ aArea = new double [lDimension7];
                           printf("Failed to create feature in shapefile.\n");
                           exit(1);
                         }
+                      
 
                       OGRFeature::DestroyFeature(poFeature);
                     }
