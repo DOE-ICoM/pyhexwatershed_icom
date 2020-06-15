@@ -22,6 +22,9 @@
 #include <netcdf>
 //gdal library
 #include "ogrsf_frmts.h"
+#include "gdalwarper.h"
+#include "ogr_spatialref.h"
+//model
 #include "system.h"
 #include "hexagon.h"
 #include "segment.h"

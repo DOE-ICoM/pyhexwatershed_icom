@@ -500,7 +500,7 @@ namespace hexwatershed
     double dX_dummy, dY_dummy;
     //read raster
     //first read the dem data as a matrix
-    read_digital_elevation_model(std::move(sFilename_elevation_in));
+    //read_digital_elevation_model(std::move(sFilename_elevation_in));
     //read netcdf
 
     error_code = read_hexagon_polygon_netcdf(sFilename_hexagon_netcdf_in);
@@ -539,6 +539,23 @@ namespace hexwatershed
     std::vector<vertex>::iterator pIterator;
 
     lLocal_index = 0;
+
+    GDALDriverH hDriver;
+    GDALDataType eDT;
+    //GDALDatasetH hDstDS;
+    GDALDatasetH hSrcDS;
+
+    // Open the source file.
+    hSrcDS = GDALOpen( sFilename_elevation_raster.c_str(), GA_ReadOnly );
+    CPLAssert( hSrcDS != NULL );
+
+    // Get Source coordinate system.
+    const char *pszSrcWKT, *pszDstWKT = NULL;
+    pszSrcWKT = GDALGetProjectionRef( hSrcDS );
+    CPLAssert( pszSrcWKT != NULL && strlen(pszSrcWKT) > 0 );
+
+
+
     //#pragma omp parallel for private(lRecord, dX_dummy, dY_dummy, \
     lColumn_index, lRow_index, dDummy1, dDummy2, lIndex)
 
@@ -586,6 +603,32 @@ namespace hexwatershed
           }
         else
           {
+
+            // Setup warp options.
+            GDALWarpOptions *psWarpOptions = GDALCreateWarpOptions();
+            psWarpOptions->hSrcDS = hSrcDS;
+            //psWarpOptions->hDstDS = hDstDS;
+            psWarpOptions->nBandCount = 1;
+            psWarpOptions->panSrcBands =
+              (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
+            psWarpOptions->panSrcBands[0] = 1;
+            //psWarpOptions->panDstBands =
+            //  (int *) CPLMalloc(sizeof(int) * psWarpOptions->nBandCount );
+            //psWarpOptions->panDstBands[0] = 1;
+            psWarpOptions->pfnProgress = GDALTermProgress;
+            // Establish reprojection transformer.
+            psWarpOptions->pTransformerArg =
+              GDALCreateGenImgProjTransformer( hSrcDS,
+                                               GDALGetProjectionRef(hSrcDS),
+                                               hDstDS,
+                                               GDALGetProjectionRef(hDstDS),
+                                               FALSE, 0.0, 1 );
+            psWarpOptions->pfnTransformer = GDALGenImgProjTransform;
+
+            // Initialize and execute the warp operation.
+            GDALWarpOperation oOperation;
+            oOperation.Initialize( psWarpOptions );
+
             //at least one is valid
             //calculate center location
             //dX_dummy = (std::accumulate(vX.begin(), vX.end(), 0.0)) / nPt;
@@ -651,6 +694,16 @@ namespace hexwatershed
                     lLocal_index = lLocal_index + 1;
                     vCell_active.push_back(*iIterator);
                   }
+
+
+                oOperation.ChunkAndWarpImage( 0, 0,
+                                              GDALGetRasterXSize( hDstDS ),
+                                              GDALGetRasterYSize( hDstDS ) );
+
+                GDALDestroyGenImgProjTransformer( psWarpOptions->pTransformerArg );
+                GDALDestroyWarpOptions( psWarpOptions );
+                GDALClose( hDstDS );
+                GDALClose( hSrcDS );
               }
             else
               {
@@ -2708,7 +2761,7 @@ namespace hexwatershed
       }
 
     GIntBig lValue;
-GIntBig lIndex_downslope2;
+    GIntBig lIndex_downslope2;
 
     double dValue;
     std::string sFieldname_elevation = "elev";
@@ -2754,18 +2807,18 @@ GIntBig lIndex_downslope2;
         exit(1);
       }
 
-      if (poLayer->CreateField(&oField_elevation) != OGRERR_NONE)
+    if (poLayer->CreateField(&oField_elevation) != OGRERR_NONE)
       {
         printf("Creating Name field failed.\n");
         exit(1);
       }
 
-if (poLayer->CreateField(&oField_id) != OGRERR_NONE)
+    if (poLayer->CreateField(&oField_id) != OGRERR_NONE)
       {
         printf("Creating Name field failed.\n");
         exit(1);
       }
-      if (poLayer->CreateField(&oField_downslope) != OGRERR_NONE)
+    if (poLayer->CreateField(&oField_downslope) != OGRERR_NONE)
       {
         printf("Creating Name field failed.\n");
         exit(1);
@@ -2790,12 +2843,12 @@ if (poLayer->CreateField(&oField_id) != OGRERR_NONE)
                       lIndex_downslope = (*iIterator).lIndex_downslope;
                       lIndex_downslope2= lIndex_downslope;
                       //iValue = (*iIterator).iSegment;
-                      poFeature->SetField(sFieldname_in.c_str(), lValue);                      
+                      poFeature->SetField(sFieldname_in.c_str(), lValue);
                       poFeature->SetField(sFieldname_elevation.c_str(), dValue);
                       poFeature->SetField(sFieldname_id.c_str(), lValue);
                       poFeature->SetField(sFieldname_downslope.c_str(), lIndex_downslope2);
 
-                      
+
                       dX_end = vCell_active.at(lIndex_downslope).dX;
                       dY_end = vCell_active.at(lIndex_downslope).dY;
 
@@ -2810,7 +2863,7 @@ if (poLayer->CreateField(&oField_id) != OGRERR_NONE)
                           printf("Failed to create feature in shapefile.\n");
                           exit(1);
                         }
-                      
+
 
                       OGRFeature::DestroyFeature(poFeature);
                     }
