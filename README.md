@@ -9,7 +9,7 @@ https://github.com/changliao1025/hexwatershed
 
 Spatial discretization is the cornerstone of all spatially-distributed numerical simulations including watershed hydrology. Traditional square grid spatial discretization has several limitations including inability to represent adjacency uniformly. 
 
-# Illustration 
+# Illustration
 
 # Citations
 Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a hexagonal mesh grid. Environmental Modelling & Software, 104702.
