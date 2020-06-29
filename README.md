@@ -20,7 +20,7 @@ https://www.sciencedirect.com/science/article/pii/S1364815219308278
 The research described in this paper was primarily funded by DOE INTEGRATED COASTAL MODELING (ICoM). 
 
 # Compile
-1. git clone git@github.com:changliao1025/hexwatershed.git
+1. git clone git@github.com:DOE-ICoM/hexwatershed_coastal.git
 2. Navigate to the directory which has the CMakeLists.txt file
 3. Adjust your configuration of the CMakeLists.txt
 4. cmake CMakeLists.txt
