@@ -17,7 +17,7 @@ Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a
 https://www.sciencedirect.com/science/article/pii/S1364815219308278
 
 # Acknowledgement
-The research described in this paper was primarily funded by a INTEGRATED COASTAL MODELING (ICoM) at Pacific Northwest National Laboratory. CL and LRL were also partly supported by U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project. 
+The research described in this paper was primarily funded by DOE INTEGRATED COASTAL MODELING (ICoM). 
 
 # Compile
 1. git clone git@github.com:changliao1025/hexwatershed.git
