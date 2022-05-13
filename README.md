@@ -1,5 +1,5 @@
 # Introduction
-This a short course for the HexWatershed model.
+This a repository for the HexWatershed model on the MPAS mesh only.
 For more details, please refer to the HexWatershed documentation (https://hexwatershed.readthedocs.io/).
 
 # Requirements
