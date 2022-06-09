@@ -50,17 +50,41 @@ for iMesh_type in range(1, 5):
         exit()
     if iMesh_type != 4:
         for iResolution in range(1, 3):    
+            iFlag_stream_burning_topology = 0 
             dResolution_meter = aResolution_meter[iResolution-1]
             oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
-                iCase_index_in=iCase_index, dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
+                iCase_index_in=iCase_index,iFlag_stream_burning_topology_in=iFlag_stream_burning_topology,\
+                     dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
             oPyhexwatershed.create_hpc_job()
+            oPyhexwatershed.export_config_to_json()
+            print(iCase_index)
+            iCase_index = iCase_index + 1
+            iFlag_stream_burning_topology = 1
+            oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
+                iCase_index_in=iCase_index,  iFlag_stream_burning_topology_in=iFlag_stream_burning_topology,\
+                    dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
+            oPyhexwatershed.create_hpc_job()
+            oPyhexwatershed.export_config_to_json()
+            print(iCase_index)
             iCase_index = iCase_index + 1
             continue            
             
     else:
         #mpas mesh only has one resolution
+        iFlag_stream_burning_topology = 0 
         oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
-                iCase_index_in=iCase_index, dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
+                iCase_index_in=iCase_index,iFlag_stream_burning_topology_in=iFlag_stream_burning_topology,\
+                     dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
         oPyhexwatershed.create_hpc_job()
+        print(iCase_index)
+        iCase_index = iCase_index + 1
+
+        iFlag_stream_burning_topology = 1 
+        oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
+                iCase_index_in=iCase_index,iFlag_stream_burning_topology_in=iFlag_stream_burning_topology,\
+                     dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
+        oPyhexwatershed.create_hpc_job()
+        oPyhexwatershed.export_config_to_json()
+        print(iCase_index)
         iCase_index = iCase_index + 1
         pass

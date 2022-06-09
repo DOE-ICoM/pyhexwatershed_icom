@@ -16,7 +16,7 @@
     "iFlag_resample_method": 2,
     "iFlag_save_elevation": 1,
     "iFlag_save_mesh": 1,
-    "iFlag_simplification": 0,
+    "iFlag_simplification": 1,
     "iFlag_stream_burning_topology": 1,
     "iFlag_use_mesh_dem": 0,
     "iMesh_type": 1,
