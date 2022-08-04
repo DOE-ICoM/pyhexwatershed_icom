@@ -57,7 +57,7 @@ for iMesh_type in range(1, 5):
         exit()
     if iMesh_type != 4:
         for iResolution in range(1, 3):    
-            iFlag_stream_burning_topology = 0 
+            
             dResolution_meter = aResolution_meter[iResolution-1]
             iFlag_stream_burning_topology = 0
             iFlag_use_mesh_dem = 0
@@ -68,8 +68,7 @@ for iMesh_type in range(1, 5):
                         iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                             iFlag_elevation_profile_in=iFlag_elevation_profile,\
                      dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-            oPyhexwatershed.create_hpc_job()
-            oPyhexwatershed.export_config_to_json()
+            oPyhexwatershed.create_hpc_job()            
             print(iCase_index)
 
             sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
@@ -85,8 +84,9 @@ for iMesh_type in range(1, 5):
                       iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                             iFlag_elevation_profile_in=iFlag_elevation_profile,\
                     dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-            oPyhexwatershed.create_hpc_job()
-            oPyhexwatershed.export_config_to_json()
+            if iCase_index ==8:
+                print('debug')
+            oPyhexwatershed.create_hpc_job()            
             print(iCase_index)
 
             sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
@@ -122,8 +122,7 @@ for iMesh_type in range(1, 5):
                       iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                             iFlag_elevation_profile_in=iFlag_elevation_profile,\
                      dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-        oPyhexwatershed.create_hpc_job()
-        oPyhexwatershed.export_config_to_json()
+        oPyhexwatershed.create_hpc_job()        
 
         sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
         ofs.write(sLine)
