@@ -26,21 +26,23 @@ else:
 #===========================
 #setup case information
 #===========================
+iFlag_create_job=1
 iFlag_visualization =0 
-iCase_index = 1
+iCase_index = 5
 aResolution_meter = [5000, 40000]
 nResolution = len(aResolution_meter)
 sMesh_type = 'square'
-sDate='20220801'
+sDate='20220901'
 
 #===================================
 #setup output and HPC job 
 #===================================
-sSlurm = 'short'
-sFilename = sWorkspace_output + '/' + sMesh_type + '.bash'
-ofs = open(sFilename, 'w')
-sLine  = '#!/bin/bash' + '\n'
-ofs.write(sLine)
+if iFlag_create_job ==1:
+    sSlurm = 'short'
+    sFilename = sWorkspace_output + '/' + sMesh_type + '.bash'
+    ofs = open(sFilename, 'w')
+    sLine  = '#!/bin/bash' + '\n'
+    ofs.write(sLine)
 
 #===================================
 #visualization spatial extent
@@ -52,7 +54,7 @@ aExtent_confluence = [-77.3,-76.5, 40.2,41.0] #confluence
 aExtent_outlet = [-76.0,-76.5, 39.5,40.0] #outlet
 aExtent_dam = [-75.75,-76.15, 42.1,42.5] #dam  
 
-for iResolution in range(1, nResolution):        
+for iResolution in range(1, nResolution+1):        
     dResolution_meter = aResolution_meter[iResolution-1]
 
     #===================================
@@ -67,12 +69,12 @@ for iResolution in range(1, nResolution):
                 iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                     iFlag_elevation_profile_in=iFlag_elevation_profile,\
              dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-    oPyhexwatershed.create_hpc_job()            
-    
-    sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
-    ofs.write(sLine)
-    sLine  = 'sbatch submit.job' + '\n'
-    ofs.write(sLine)
+    if iFlag_create_job ==1:
+        oPyhexwatershed._create_hpc_job()   
+        sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
+        ofs.write(sLine)
+        sLine  = 'sbatch submit.job' + '\n'
+        ofs.write(sLine)
     
     iCase_index = iCase_index + 1
 
@@ -86,16 +88,15 @@ for iResolution in range(1, nResolution):
                     iFlag_elevation_profile_in=iFlag_elevation_profile,\
             dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
     
-    oPyhexwatershed.create_hpc_job()            
- 
-    sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
-    ofs.write(sLine)
-    sLine  = 'sbatch submit.job' + '\n'
-    ofs.write(sLine)
+    if iFlag_create_job ==1:
+        oPyhexwatershed._create_hpc_job()   
+        sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
+        ofs.write(sLine)
+        sLine  = 'sbatch submit.job' + '\n'
+        ofs.write(sLine)
 
     iCase_index = iCase_index + 1
             
-              
-
-ofs.close()
-os.chmod(sFilename, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)   
+if iFlag_create_job ==1:
+    ofs.close()
+    os.chmod(sFilename, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR) 
