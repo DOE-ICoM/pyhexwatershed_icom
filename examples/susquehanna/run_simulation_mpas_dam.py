@@ -16,7 +16,7 @@ sWorkspace_output = '/compyfs/liao313/04model/pyhexwatershed/susquehanna'
 #===================================
 #you need to update this file based on your own case study
 #===================================
-sFilename_configuration_in = realpath( sPath_parent +  '/examples/susquehanna/pyhexwatershed_susquehanna_mpas.json' )
+sFilename_configuration_in = realpath( sPath_parent +  '/examples/susquehanna/pyhexwatershed_susquehanna_mpas_dam.json' )
 if os.path.isfile(sFilename_configuration_in):
     pass
 else:
@@ -26,9 +26,9 @@ else:
 #===========================
 #setup case information
 #===========================
-iFlag_create_job=0
-iFlag_visualization =1
-iCase_index = 13
+iFlag_create_job=1
+iFlag_visualization =0
+iCase_index = 15
 sMesh_type = 'mpas'
 sDate='20220901'
 
