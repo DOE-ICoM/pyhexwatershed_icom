@@ -26,8 +26,8 @@ else:
 #===========================
 #setup case information
 #===========================
-iFlag_create_job=1
-iFlag_visualization =0
+iFlag_create_job=0
+iFlag_visualization =1
 iCase_index = 15
 sMesh_type = 'mpas'
 sDate='20220901'
