@@ -1,0 +1,18 @@
+[
+    {
+        "dLatitude_outlet_degree": 46.26105,
+        "dLongitude_outlet_degree": -123.46834,   
+        "dAccumulation_threshold": 100000,
+        "dThreshold_small_river": 10000,
+        "iFlag_dam": 0,
+        "iFlag_debug": 1,
+        "iFlag_disconnected": 0,
+        "lBasinID": 1,
+        "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/columbia/auxiliary/ICoM_dams.csv",
+        "sFilename_flowline_filter": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/columbia/input/river70386275.geojson",
+        "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/columbia/vector/hydrology/allflowline.shp",
+        "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/columbia/auxiliary/flowline.csv"
+        
+    
+    }
+]

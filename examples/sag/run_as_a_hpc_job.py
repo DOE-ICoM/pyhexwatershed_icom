@@ -37,7 +37,7 @@ ofs = open(sFilename, 'w')
 sLine  = '#!/bin/bash' + '\n'
 ofs.write(sLine)
 
-sFilename_configuration_in = realpath( sPath +  '/example/sag/pyhexwatershed_sag_mpas.json' )
+sFilename_configuration_in = realpath( sPath +  '/examples/sag/pyhexwatershed_sag_mpas.json' )
 
     
 if os.path.isfile(sFilename_configuration_in):
