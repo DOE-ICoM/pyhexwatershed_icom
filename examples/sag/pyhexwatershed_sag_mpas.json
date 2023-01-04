@@ -7,6 +7,7 @@
     "sWorkspace_output": "/compyfs/liao313/04model/pyhexwatershed/sag",
     "sJob": "hexwatershed",
     "iFlag_create_mesh": 1,
+    "iFlag_mesh_boundary": 1,
     "iFlag_save_mesh" :1 ,
     "iFlag_simplification": 1,
     "iFlag_intersect": 1,
@@ -36,6 +37,7 @@
     "sFilename_hexwatershed": "hexwatershed",
     "sFilename_spatial_reference": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/boundary_proj_buff.shp",
     "sFilename_dem": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/dem_buff_ext.tif",
+    "sFilename_mesh_boundary": "/qfs/people/liao313/data/hexwatershed/sag/vector/hydrology/mesh_boundary_buffer.geojson",
     "sFilename_mesh_netcdf": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/lnd_mesh.nc",    
-    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/example/sag/pyflowline_sag_basins.json"    
+    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/examples/sag/pyflowline_sag_basins.json"    
 }

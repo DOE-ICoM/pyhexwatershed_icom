@@ -6,29 +6,34 @@ from os.path import realpath
 import argparse
 import cartopy.crs as ccrs
 
-
-
 from pyhexwatershed.classes.pycase import hexwatershedcase
 from pyhexwatershed.pyhexwatershed_read_model_configuration_file import pyhexwatershed_read_model_configuration_file
 
 
-sMesh_type = 'mpas'
-iCase_index = 3
-dResolution_meter=5000
 iFlag_create_job=1
 iFlag_visualization =0
-aExtent_full = [-125,-109, 40,53.0]
-dLongitude_outlet_degree=-117
-dLatitude_outlet_degree=42
+
+sMesh_type = 'mpas'
+iCase_index = 6
+dResolution_meter=5000
+sDate='20221115'
+
+aExtent_full = [-81.1,-73, 36,43]
+
+dLongitude_outlet_degree=-76
+dLatitude_outlet_degree=39
+
+
 pProjection_map = ccrs.Orthographic(central_longitude=  dLongitude_outlet_degree, \
         central_latitude= dLatitude_outlet_degree, globe=None)
 
-sDate='20221115'
 sPath = str( Path().resolve() )
 iFlag_option = 1
-sWorkspace_data = realpath( sPath +  '/data/columbia' )
+sWorkspace_data = realpath( sPath +  '/data/icom' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
-sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/columbia'
+sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/icom'
+
+
 
 
 #generate a bash job script
@@ -38,7 +43,7 @@ if iFlag_create_job ==1:
     sLine  = '#!/bin/bash' + '\n'
     ofs.write(sLine)
 
-sFilename_configuration_in = realpath( sPath +  '/examples/columbia/pyhexwatershed_columbia_mpas.json' )
+sFilename_configuration_in = realpath( sPath +  '/examples/icom/pyhexwatershed_icom_mpas_dam.json' )
 
     
 if os.path.isfile(sFilename_configuration_in):
@@ -56,7 +61,6 @@ oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configu
                 iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                 iFlag_elevation_profile_in=iFlag_elevation_profile,\
                 dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-
 if iFlag_create_job ==1:
     oPyhexwatershed._create_hpc_job()
     print(iCase_index)
@@ -64,6 +68,7 @@ if iFlag_create_job ==1:
     ofs.write(sLine)
     sLine  = 'sbatch submit.job' + '\n'
     ofs.write(sLine)
+
 
 if iFlag_visualization == 1:
     sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_elevation.png' )
@@ -80,9 +85,6 @@ if iFlag_visualization == 1:
     oPyhexwatershed._plot(sFilename, iFlag_type_in =4, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)  
     sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'travel_distance.png' )
     oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'distance_to_outlet', aExtent_in=aExtent_full, pProjection_map_in=pProjection_map)    
-
-
-
 
 
 if iFlag_create_job ==1:

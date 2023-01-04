@@ -1,6 +1,6 @@
 # Introduction
 
-This a repository for the HexWatershed part 2 study.
+This a repository for the HexWatershed simulations.
 For more details, please refer to the HexWatershed documentation (https://hexwatershed.readthedocs.io/).
 
 # Requirements

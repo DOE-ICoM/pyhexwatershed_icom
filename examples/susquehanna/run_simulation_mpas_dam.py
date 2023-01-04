@@ -26,11 +26,11 @@ else:
 #===========================
 #setup case information
 #===========================
-iFlag_create_job=0
-iFlag_visualization =1
-iCase_index = 15
+iFlag_create_job=1
+iFlag_visualization =0
+iCase_index = 1
 sMesh_type = 'mpas'
-sDate='20220901'
+sDate='20221115'
 
 #===================================
 #setup output and HPC job 
@@ -60,10 +60,9 @@ aExtent_dam = [-75.75,-76.15, 42.1,42.5] #dam
 dResolution_meter = 5000
 iFlag_use_mesh_dem = 1
 iFlag_elevation_profile = 1
+iFlag_stream_burning_topology = 1
 #===================================
-#topology turn off
-#===================================
-iFlag_stream_burning_topology = 0
+
 
 oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
     iCase_index_in=iCase_index,\
@@ -73,12 +72,14 @@ oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configu
          dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
 oPyhexwatershed.pPyFlowline.aBasin[0].dLatitude_outlet_degree=dLatitude_outlet_degree
 oPyhexwatershed.pPyFlowline.aBasin[0].dLongitude_outlet_degree=dLongitude_outlet_degree
+
 if iFlag_create_job ==1:
     oPyhexwatershed._create_hpc_job()   
     sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
     ofs.write(sLine)
     sLine  = 'sbatch submit.job' + '\n'
     ofs.write(sLine)
+
 if iFlag_visualization == 1:
     sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_elevation.png' )
     oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'elevation', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)     
@@ -96,44 +97,7 @@ if iFlag_visualization == 1:
     oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'distance_to_outlet', aExtent_in=aExtent_full, pProjection_map_in=pProjection_map)  
      
 
-iCase_index = iCase_index + 1
-#===================================
-#topology turn on
-#===================================
-iFlag_stream_burning_topology = 1
-oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configuration_in,\
-    iCase_index_in=iCase_index,  iFlag_stream_burning_topology_in=iFlag_stream_burning_topology,\
-          iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
-                iFlag_elevation_profile_in=iFlag_elevation_profile,\
-        dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type) 
-oPyhexwatershed.pPyFlowline.aBasin[0].dLatitude_outlet_degree=dLatitude_outlet_degree
-oPyhexwatershed.pPyFlowline.aBasin[0].dLongitude_outlet_degree=dLongitude_outlet_degree
-if iFlag_create_job ==1:
-    oPyhexwatershed._create_hpc_job()   
-    sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
-    ofs.write(sLine)
-    sLine  = 'sbatch submit.job' + '\n'
-    ofs.write(sLine)
-
-if iFlag_visualization == 1:
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_elevation.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'elevation', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)     
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_slope.png' )        
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'slope', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map) 
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'drainage_area.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'drainagearea', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)   
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =2, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map) 
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_mesh.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =3, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)    
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_observation.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =4, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)  
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'travel_distance.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'distance_to_outlet', aExtent_in=aExtent_full, pProjection_map_in=pProjection_map)    
-     
-
-iCase_index = iCase_index + 1
-          
+  
               
 
 if iFlag_create_job ==1:

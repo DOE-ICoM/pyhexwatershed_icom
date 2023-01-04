@@ -9,7 +9,7 @@
         "iFlag_disconnected": 0,
         "lBasinID": 1,
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/amazon/auxiliary/ICoM_dams.csv",
-        "sFilename_flowline_filter": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/amazon/input/river70386275.geojson",
+        "sFilename_flowline_filter": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/amazon/input/river60443230.geojson",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/amazon/vector/hydrology/allflowline.shp",
         "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/amazon/auxiliary/flowline.csv"
         

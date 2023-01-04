@@ -4,12 +4,7 @@ from sre_constants import IN
 from pathlib import Path
 from os.path import realpath
 import argparse
-import logging
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
 
-logging.basicConfig(format='%(asctime)s %(message)s')
-logging.warning('is the time pyhexwatershed simulation started.')
 
 from pyhexwatershed.classes.pycase import hexwatershedcase
 from pyhexwatershed.pyhexwatershed_read_model_configuration_file import pyhexwatershed_read_model_configuration_file
@@ -26,9 +21,7 @@ sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
 sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/sag'
 
 
-aMesh_type = ['hexagon', 'square','latlon','mpas']
-aResolution_meter = [5000, 40000]
-iCase_index = 1
+
 
 #generate a bash job script
 
@@ -55,7 +48,7 @@ oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configu
                 iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                 iFlag_elevation_profile_in=iFlag_elevation_profile,\
                 dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-oPyhexwatershed.create_hpc_job()
+oPyhexwatershed._create_hpc_job()
 print(iCase_index)
 sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
 ofs.write(sLine)
