@@ -8,6 +8,7 @@
         "iFlag_debug": 1,
         "iFlag_disconnected": 0,
         "lBasinID": 1,
+        "sMesh_type": "mpas",  
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_filter": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/susquehanna/input/flowline.geojson",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",

@@ -34,10 +34,11 @@
     "dResolution_meter": 50000,
     "sDate": "20220725",        
     "sMesh_type": "mpas",       
-    "sFilename_hexwatershed": "hexwatershed",
+    "iFlag_user_provided_binary": 1,   
+    "sFilename_hexwatershed_bin": "/qfs/people/liao313/workspace/cplus/hexwatershed/bin/hexwatershed",
     "sFilename_spatial_reference": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/boundary_proj_buff.shp",
     "sFilename_dem": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/dem_buff_ext.tif",
     "sFilename_mesh_boundary": "/qfs/people/liao313/data/hexwatershed/sag/vector/hydrology/mesh_boundary_buffer.geojson",
     "sFilename_mesh_netcdf": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/lnd_mesh.nc",    
-    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/examples/sag/pyflowline_sag_basins.json"    
+    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/sag/input/pyhexwatershed_sag_basins.json"    
 }

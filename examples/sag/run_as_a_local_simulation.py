@@ -1,6 +1,6 @@
 
 import os, sys, stat
-from sre_constants import IN
+
 from pathlib import Path
 from os.path import realpath
 import argparse
@@ -19,9 +19,6 @@ iFlag_option = 1
 sWorkspace_data = realpath( sPath +  '/data/sag' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
 sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/sag'
-
-
-
 
 #generate a bash job script
 
@@ -48,12 +45,27 @@ oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configu
                 iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,\
                 iFlag_elevation_profile_in=iFlag_elevation_profile,\
                 dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
-oPyhexwatershed._create_hpc_job()
-print(iCase_index)
-sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
-ofs.write(sLine)
-sLine  = 'sbatch submit.job' + '\n'
-ofs.write(sLine)
+
+if oPyhexwatershed.iFlag_global==1:
+    #global simulation
+    #we can only suport MPAS/latlon mesh at global scale right now
+    pass
+else:
+    #regional simulation
+    if oPyhexwatershed.iFlag_multiple_outlet ==1:
+        pass
+    else:
+        #single basin example       
+        
+        #oPyhexwatershed.setup()       
+        #oPyhexwatershed.run_pyflowline()        
+        #oPyhexwatershed.pPyFlowline.export()        
+        #oPyhexwatershed.export_config_to_json()
+        #oPyhexwatershed.run_hexwatershed()
+        #oPyhexwatershed.analyze()
+        oPyhexwatershed.export()
+        pass
+    pass   
 
 
 pass

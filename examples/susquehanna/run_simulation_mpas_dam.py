@@ -26,11 +26,11 @@ else:
 #===========================
 #setup case information
 #===========================
-iFlag_create_job=1
-iFlag_visualization =0
+iFlag_create_job=0
+iFlag_visualization =1
 iCase_index = 1
 sMesh_type = 'mpas'
-sDate='20221115'
+sDate='20230701'
 
 #===================================
 #setup output and HPC job 
@@ -81,24 +81,33 @@ if iFlag_create_job ==1:
     ofs.write(sLine)
 
 if iFlag_visualization == 1:
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_elevation.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'elevation', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)     
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'surface_slope.png' )        
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'slope', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map) 
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'drainage_area.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'drainagearea', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)   
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =2, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map) 
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_mesh.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =3, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)    
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_observation.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =4, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)  
-    sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'travel_distance.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'distance_to_outlet', aExtent_in=aExtent_full, pProjection_map_in=pProjection_map)  
-     
+    pBasin_hexwatershed = oPyhexwatershed.aBasin[0]
+    sWorkspace_output_basin = pBasin_hexwatershed.sWorkspace_output_basin
 
-  
-              
+    #polyline
+    sFilename = os.path.join( sWorkspace_output_basin, 'flow_direction.png' )
+    oPyhexwatershed.plot( sVariable_in = 'flow_direction', sFilename_output_in = sFilename, iFont_size_in= 14)
+
+    #polygon    
+    sFilename = os.path.join(  sWorkspace_output_basin, 'surface_elevation.png' )    
+    #oPyhexwatershed.plot( sVariable_in = 'elevation', sFilename_output_in = sFilename, iFont_size_in= 12, dData_min_in=0, dData_max_in=800)     
+
+    sFilename = os.path.join(  sWorkspace_output_basin, 'surface_slope.png' )        
+    oPyhexwatershed.plot( sVariable_in = 'slope', sFilename_output_in = sFilename, iFont_size_in= 12, dData_min_in=0, dData_max_in=0.1 )
+    
+    sFilename = os.path.join( sWorkspace_output_basin, 'drainage_area.png' )
+    #oPyhexwatershed.plot( sVariable_in = 'drainage_area',  sFilename_output_in = sFilename, iFont_size_in= 12, dData_min_in=0, dData_max_in=1E10, iFlag_scientific_notation_colorbar_in=1 )
+    
+    sFilename = os.path.join(  sWorkspace_output_basin, 'travel_distance.png' )
+    #oPyhexwatershed.plot( sVariable_in = 'travel_distance', sFilename_output_in = sFilename, iFont_size_in= 12, dData_min_in=0, dData_max_in=1E6 ,iFlag_scientific_notation_colorbar_in=1)
+    #mixed
+    sFilename = os.path.join( sWorkspace_output_basin, 'flow_direction_w_mesh.png' )
+    #oPyhexwatershed.plot( sVariable_in = 'flow_direction_with_mesh', sFilename_output_in = sFilename)  
+    
+    sFilename = os.path.join(  sWorkspace_output_basin, 'flow_direction_w_observation.png' )
+    #oPyhexwatershed.plot( sVariable_in = 'flow_direction_with_observation',  sFilename_output_in = sFilename)
+     
+   
 
 if iFlag_create_job ==1:
     ofs.close()

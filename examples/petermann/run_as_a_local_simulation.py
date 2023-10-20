@@ -10,17 +10,20 @@ from pyhexwatershed.pyhexwatershed_read_model_configuration_file import pyhexwat
 
 
 sMesh_type = 'mpas'
-iCase_index = 3
+iCase_index = 2
 dResolution_meter=5000
 sDate='20221115'
 sPath = str( Path().resolve() )
 iFlag_option = 1
-sWorkspace_data = realpath( sPath +  '/data/columbia' )
+sWorkspace_data = realpath( sPath +  '/data/petermann' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
-sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/columbia'
+sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/petermann'
 
 
-
+if os.path.isdir(sWorkspace_output):
+    pass
+else:   
+    os.makedirs(sWorkspace_output, exist_ok=True)
 
 #generate a bash job script
 
@@ -29,7 +32,7 @@ ofs = open(sFilename, 'w')
 sLine  = '#!/bin/bash' + '\n'
 ofs.write(sLine)
 
-sFilename_configuration_in = realpath( sPath +  '/examples/columbia/pyhexwatershed_columbia_mpas.json' )
+sFilename_configuration_in = realpath( sPath +  '/examples/petermann/pyhexwatershed_petermann_mpas.json' )
 
 if os.path.isfile(sFilename_configuration_in):
     print(sFilename_configuration_in)
@@ -65,9 +68,9 @@ else:
         #oPyhexwatershed.pPyFlowline.dLatitude_bot= 39.20
         #oPyhexwatershed.pPyFlowline.dLatitude_top= 42.8
         oPyhexwatershed.run_pyflowline()        
-        #oPyhexwatershed.pPyFlowline.export()
-        #oPyhexwatershed.export_config_to_json()
-        #oPyhexwatershed.run_hexwatershed()
+        oPyhexwatershed.pPyFlowline.export()
+        oPyhexwatershed.export_config_to_json()
+        oPyhexwatershed.run_hexwatershed()
         oPyhexwatershed.analyze()
         oPyhexwatershed.export()
         pass

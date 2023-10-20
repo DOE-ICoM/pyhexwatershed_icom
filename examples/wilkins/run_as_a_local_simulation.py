@@ -10,17 +10,20 @@ from pyhexwatershed.pyhexwatershed_read_model_configuration_file import pyhexwat
 
 
 sMesh_type = 'mpas'
-iCase_index = 3
+iCase_index = 5
 dResolution_meter=5000
-sDate='20221115'
+sDate='20230601'
 sPath = str( Path().resolve() )
 iFlag_option = 1
-sWorkspace_data = realpath( sPath +  '/data/columbia' )
+sWorkspace_data = realpath( sPath +  '/data/wilkins' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
-sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/columbia'
+sWorkspace_output=  '/compyfs/liao313/04model/pyhexwatershed/wilkins'
 
 
-
+if os.path.isdir(sWorkspace_output):
+    pass
+else:   
+    os.makedirs(sWorkspace_output, exist_ok=True)
 
 #generate a bash job script
 
@@ -29,7 +32,7 @@ ofs = open(sFilename, 'w')
 sLine  = '#!/bin/bash' + '\n'
 ofs.write(sLine)
 
-sFilename_configuration_in = realpath( sPath +  '/examples/columbia/pyhexwatershed_columbia_mpas.json' )
+sFilename_configuration_in = realpath( sPath +  '/examples/wilkins/pyhexwatershed_wilkins_mpas.json' )
 
 if os.path.isfile(sFilename_configuration_in):
     print(sFilename_configuration_in)
@@ -56,19 +59,13 @@ else:
         pass
     else:
         #single basin example       
-        #mpas mesh has elevation built-in
-        #oPyhexwatershed.pPyFlowline.aBasin[0].dLatitude_outlet_degree=39.4620
-        #oPyhexwatershed.pPyFlowline.aBasin[0].dLongitude_outlet_degree=-76.0093
-        oPyhexwatershed.setup()
-        #oPyhexwatershed.pPyFlowline.dLongitude_left= -79
-        #oPyhexwatershed.pPyFlowline.dLongitude_right= -74.5
-        #oPyhexwatershed.pPyFlowline.dLatitude_bot= 39.20
-        #oPyhexwatershed.pPyFlowline.dLatitude_top= 42.8
-        oPyhexwatershed.run_pyflowline()        
-        #oPyhexwatershed.pPyFlowline.export()
+        
+        #oPyhexwatershed.setup()       
+        #oPyhexwatershed.run_pyflowline()        
+        #oPyhexwatershed.pPyFlowline.export()        
         #oPyhexwatershed.export_config_to_json()
         #oPyhexwatershed.run_hexwatershed()
-        oPyhexwatershed.analyze()
+        #oPyhexwatershed.analyze()
         oPyhexwatershed.export()
         pass
     pass   
