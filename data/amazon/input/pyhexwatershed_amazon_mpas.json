@@ -39,5 +39,5 @@
     "sFilename_mesh_boundary": "/qfs/people/liao313/data/hexwatershed/amazon/vector/hydrology/amazon_boundary.geojson",
     "sFilename_dem": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/amazon/input/dem_buff_ext.tif",
     "sFilename_mesh_netcdf": "/compyfs/liao313/00raw/mesh/global/lnd_mesh.nc",    
-    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/examples/amazon/pyflowline_amazon_basins.json"    
+    "sFilename_basins": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/amazon/input/pyflowline_amazon_basins.json"    
 }

@@ -1,10 +1,7 @@
 
 import os,  stat
-
 from pathlib import Path
 from os.path import realpath
-
-import cartopy.crs as ccrs
 
 import logging
 for handler in logging.root.handlers[:]:
@@ -18,7 +15,7 @@ from pyhexwatershed.pyhexwatershed_read_model_configuration_file import pyhexwat
 
 
 sMesh_type = 'mpas'
-iCase_index = 1
+iCase_index = 3
 dResolution_meter=5000
 iFlag_create_job=1
 iFlag_visualization =0
@@ -46,7 +43,7 @@ if iFlag_create_job ==1:
     sLine  = '#!/bin/bash' + '\n'
     ofs.write(sLine)
 
-sFilename_configuration_in = realpath( sPath +  '/examples/amazon/pyhexwatershed_amazon_mpas.json' )
+sFilename_configuration_in = realpath( sWorkspace_input +  '/pyhexwatershed_amazon_mpas.json' )
 
     
 if os.path.isfile(sFilename_configuration_in):
@@ -65,7 +62,7 @@ oPyhexwatershed = pyhexwatershed_read_model_configuration_file(sFilename_configu
                 iFlag_elevation_profile_in=iFlag_elevation_profile,\
                 dResolution_meter_in = dResolution_meter, sDate_in= sDate, sMesh_type_in= sMesh_type)   
 if iFlag_create_job ==1:
-    oPyhexwatershed._create_hpc_job()
+    oPyhexwatershed._pyhexwatershed_create_hpc_job()
     print(iCase_index)
     sLine  = 'cd ' + oPyhexwatershed.sWorkspace_output + '\n'
     ofs.write(sLine)
@@ -85,7 +82,7 @@ if iFlag_visualization == 1:
     #sFilename = os.path.join( oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_mesh.png' )
     #oPyhexwatershed._plot(sFilename, iFlag_type_in =3, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)    
     sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'flow_direction_w_observation.png' )
-    oPyhexwatershed._plot(sFilename, iFlag_type_in =4, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)  
+    oPyhexwatershed.plot(sFilename, iFlag_type_in =4, sVariable_in = 'flow_direction', aExtent_in=aExtent_full,pProjection_map_in=pProjection_map)  
     #sFilename = os.path.join(  oPyhexwatershed.sWorkspace_output_hexwatershed, 'travel_distance.png' )
     #oPyhexwatershed._plot(sFilename, iFlag_type_in =1, sVariable_in = 'distance_to_outlet', aExtent_in=aExtent_full, pProjection_map_in=pProjection_map)    
 
